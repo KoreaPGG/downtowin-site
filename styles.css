@@ -92,6 +92,12 @@ main > section[id] {
   letter-spacing: -0.07em;
 }
 
+.header-logo {
+  display: block;
+  width: 52px;
+  height: auto;
+}
+
 .brand-mark {
   display: grid;
   width: 29px;
