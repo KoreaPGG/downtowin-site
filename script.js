@@ -276,7 +276,9 @@ if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
           }
           node.replaceWith(fragment);
         });
-        enableTechText(element, ".scroll-tech-letter");
+        if (element.closest(".service-type-design")) {
+          enableTechText(element, ".scroll-tech-letter");
+        }
       }
 
       element.classList.add("text-entered");
