@@ -268,7 +268,7 @@ if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
               const letter = document.createElement("span");
               letter.className = "scroll-tech-letter";
               letter.setAttribute("aria-hidden", "true");
-              letter.style.setProperty("--letter-delay", `${index * delay}s`);
+              letter.style.setProperty("--letter-delay", `${index * delay + nodeIndex * 0.16}s`);
               letter.textContent = character;
               fragment.append(letter);
               index += 1;

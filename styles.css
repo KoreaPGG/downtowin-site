@@ -53,6 +53,14 @@ main > section {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  main > section.section-entered:not(.hero):not(.services):not(.work-section),
+  .services > .section-heading.section-entered,
+  .service-card.section-entered,
+  .work-heading.section-entered,
+  .work-card.section-entered {
+    animation: section-arrive 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   main > section.section-entered:not(.hero) > *,
   .services > .section-heading.section-entered > *,
   .service-card.section-entered > :not(.service-symbol),
@@ -73,7 +81,11 @@ main > section {
   main li.text-entered,
   .work-details > span.text-entered,
   .timeline-row > span.text-entered {
-    animation: text-enter 600ms ease-out both;
+    animation: text-enter 600ms ease-out 280ms both;
+  }
+
+  .work-card.section-entered .work-art {
+    animation: work-art-enter 1200ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .scroll-tech-letter,
@@ -177,6 +189,28 @@ main > section {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes section-arrive {
+  from {
+    clip-path: inset(5% 0 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes work-art-enter {
+  from {
+    opacity: 0.8;
+    scale: 0.96;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
   }
 }
 
