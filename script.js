@@ -38,7 +38,9 @@ if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
     }
   }, { rootMargin: "0px 0px -12% 0px" });
 
-  document.querySelectorAll("main > section:not(.hero)").forEach((section) => {
+  document.querySelectorAll(
+    "main > section:not(.hero):not(.services):not(.work-section), .services > .section-heading, .service-card, .work-heading, .work-card",
+  ).forEach((section) => {
     sectionObserver.observe(section);
   });
 }
