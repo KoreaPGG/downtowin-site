@@ -1,5 +1,48 @@
 const typeSpecimens = document.querySelectorAll(".type-specimen");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const storyViewport = window.matchMedia("(min-height: 600px)");
+const scrollStory = document.querySelector(".work-card-story");
+const scrollStoryStage = scrollStory?.querySelector(".work-story-stage");
+
+if (scrollStory instanceof HTMLElement && scrollStoryStage instanceof HTMLElement) {
+  let storyFrame = 0;
+  let lastStoryProgress = -1;
+  const updateStory = () => {
+    storyFrame = 0;
+    const enabled = !prefersReducedMotion.matches && storyViewport.matches;
+    scrollStory.classList.toggle("is-scroll-story", enabled);
+    if (!enabled) {
+      lastStoryProgress = -1;
+      return;
+    }
+
+    const bounds = scrollStory.getBoundingClientRect();
+    const distance = bounds.height - scrollStoryStage.offsetHeight;
+    const progress = distance > 0 ? Math.max(0, Math.min(1, -bounds.top / distance)) : 0;
+    if (progress === lastStoryProgress) {
+      return;
+    }
+    lastStoryProgress = progress;
+    scrollStoryStage.style.setProperty("--story-word-x", `${-18 + progress * 36}px`);
+    scrollStoryStage.style.setProperty("--story-word-y", `${24 - progress * 24}px`);
+    scrollStoryStage.style.setProperty("--story-word-scale", String(0.82 + progress * 0.38));
+    scrollStoryStage.style.setProperty("--story-line-angle", `${-30 + progress * 45}deg`);
+    scrollStoryStage.style.setProperty("--story-line-scale", String(0.8 + progress * 0.45));
+    scrollStoryStage.style.setProperty("--story-number-opacity", String(0.4 + progress * 0.6));
+    scrollStoryStage.style.setProperty("--story-number-y", `${36 - progress * 36}px`);
+    scrollStoryStage.style.setProperty("--story-details-y", `${20 - progress * 20}px`);
+  };
+  const scheduleStoryUpdate = () => {
+    if (!storyFrame) {
+      storyFrame = window.requestAnimationFrame(updateStory);
+    }
+  };
+  window.addEventListener("scroll", scheduleStoryUpdate, { passive: true });
+  window.addEventListener("resize", scheduleStoryUpdate);
+  prefersReducedMotion.addEventListener("change", scheduleStoryUpdate);
+  storyViewport.addEventListener("change", scheduleStoryUpdate);
+  updateStory();
+}
 
 const techTextStates = new Map();
 const techTextVisibility = "IntersectionObserver" in window

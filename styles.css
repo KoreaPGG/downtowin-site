@@ -2121,6 +2121,50 @@ main > section:not(.hero) {
   padding: 0;
 }
 
+.work-card-story {
+  display: block;
+}
+
+.work-story-stage {
+  display: grid;
+  min-height: 100vh;
+  min-height: 100svh;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
+  .work-card-story.is-scroll-story {
+    min-height: 280vh;
+    min-height: 280svh;
+  }
+
+  .is-scroll-story .work-story-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+  }
+
+  .is-scroll-story .art-changwon .art-wordmark {
+    transform: translate(var(--story-word-x, -18px), var(--story-word-y, 24px))
+      scale(var(--story-word-scale, 0.82));
+    transform-origin: left center;
+  }
+
+  .is-scroll-story .art-changwon .art-lines {
+    transform: rotate(var(--story-line-angle, -30deg)) scale(var(--story-line-scale, 0.8));
+  }
+
+  .is-scroll-story .art-changwon .art-number {
+    opacity: var(--story-number-opacity, 0.4);
+    transform: translateY(var(--story-number-y, 36px));
+  }
+
+  .is-scroll-story .work-details > * {
+    translate: 0 var(--story-details-y, 20px);
+  }
+}
+
 .work-section .work-art,
 .work-section .work-wide .work-art {
   height: 100%;
@@ -2230,6 +2274,11 @@ main > section:not(.hero) {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(220px, 1fr) auto;
     padding: 0;
+  }
+
+  .work-story-stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(220px, 1fr) auto;
   }
 
   .work-details {
