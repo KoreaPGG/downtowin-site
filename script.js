@@ -1,6 +1,13 @@
 const menuToggle = document.querySelector(".menu-toggle");
 const navigation = document.querySelector(".navigation");
 
+const updateHeaderVisibility = () => {
+  document.body.classList.toggle("has-scrolled", window.scrollY > 24);
+};
+
+window.addEventListener("scroll", updateHeaderVisibility, { passive: true });
+updateHeaderVisibility();
+
 if (menuToggle instanceof HTMLButtonElement && navigation instanceof HTMLElement) {
   menuToggle.addEventListener("click", () => {
     const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
