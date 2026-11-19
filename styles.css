@@ -8,8 +8,8 @@
   --forest: #173a29;
   --paper: #f5f6f2;
   --line: #e2e7e0;
-  --font-display: "Manrope", "Noto Sans KR", sans-serif;
-  --font-body: "DM Sans", "Noto Sans KR", sans-serif;
+  --font-body: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-display: var(--font-body);
 }
 
 * {
@@ -110,7 +110,7 @@ main > section {
     left: -5px;
     color: currentColor;
     content: attr(data-tech-label);
-    font: 9px ui-monospace, monospace;
+    font: 9px var(--font-body);
     letter-spacing: 0;
     white-space: nowrap;
     -webkit-text-fill-color: currentColor;
@@ -1029,7 +1029,7 @@ main > section {
 }
 
 .type-glyph {
-  font-family: "Noto Sans KR", serif;
+  font-family: var(--font-display);
   font-size: 155px;
   font-weight: 500;
   letter-spacing: -0.16em;
@@ -1060,7 +1060,7 @@ main > section {
 .dasi-wordmark {
   position: relative;
   z-index: 1;
-  font-family: Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(68px, 9vw, 118px);
   letter-spacing: -0.08em;
 }
@@ -1163,7 +1163,7 @@ main > section {
 }
 
 .vento-wordmark {
-  font-family: Georgia, serif;
+  font-family: var(--font-display);
   font-size: 33px;
   font-style: italic;
   letter-spacing: -0.06em;
