@@ -28,6 +28,21 @@ if (menuToggle instanceof HTMLButtonElement && navigation instanceof HTMLElement
 const typeSpecimens = document.querySelectorAll(".type-specimen");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
+  const sectionObserver = new IntersectionObserver((entries, observer) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("section-entered");
+        observer.unobserve(entry.target);
+      }
+    }
+  }, { rootMargin: "0px 0px -12% 0px" });
+
+  document.querySelectorAll("main > section:not(.hero)").forEach((section) => {
+    sectionObserver.observe(section);
+  });
+}
+
 for (const specimen of typeSpecimens) {
   if (!(specimen instanceof HTMLButtonElement)) {
     continue;
