@@ -2132,10 +2132,17 @@ main > section:not(.hero) {
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
 }
 
+.work-section .work-art,
+.work-section .work-wide .work-art {
+  height: 100%;
+  min-height: 0;
+  border-radius: 0;
+}
+
 @media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
   .work-card-story.is-scroll-story {
-    min-height: 280vh;
-    min-height: 280svh;
+    min-height: 400vh;
+    min-height: 400svh;
   }
 
   .is-scroll-story .work-story-stage {
@@ -2143,11 +2150,32 @@ main > section:not(.hero) {
     top: 0;
     height: 100vh;
     height: 100svh;
+    background-color: inherit;
   }
 
-  .is-scroll-story .art-changwon .art-wordmark {
-    transform: translate(var(--story-word-x, -18px), var(--story-word-y, 24px))
-      scale(var(--story-word-scale, 0.82));
+  .work-section .is-scroll-story .work-art {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--story-art-width, 60%);
+    height: 100%;
+  }
+
+  .is-scroll-story .work-details {
+    position: relative;
+    z-index: 1;
+    grid-column: 2;
+    grid-row: 1;
+    background-color: inherit;
+    opacity: var(--story-details-opacity, 1);
+  }
+
+  .is-scroll-story .story-graphic {
+    translate: var(--story-word-x, -18px) var(--story-word-y, 24px);
+    scale: var(--story-word-scale, 0.82);
+  }
+
+  .is-scroll-story .art-changwon .story-graphic {
     transform-origin: left center;
   }
 
@@ -2165,11 +2193,16 @@ main > section:not(.hero) {
   }
 }
 
-.work-section .work-art,
-.work-section .work-wide .work-art {
-  height: 100%;
-  min-height: 0;
-  border-radius: 0;
+@media (prefers-reduced-motion: no-preference) and (min-height: 600px) and (max-width: 680px) {
+  .work-section .is-scroll-story .work-art {
+    width: 100%;
+    height: calc(100% - var(--story-art-gap, 165px));
+  }
+
+  .is-scroll-story .work-details {
+    grid-column: 1;
+    grid-row: 2;
+  }
 }
 
 .work-card:hover .work-art {

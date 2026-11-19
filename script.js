@@ -1,36 +1,50 @@
 const typeSpecimens = document.querySelectorAll(".type-specimen");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const storyViewport = window.matchMedia("(min-height: 600px)");
-const scrollStory = document.querySelector(".work-card-story");
-const scrollStoryStage = scrollStory?.querySelector(".work-story-stage");
+const scrollStories = [...document.querySelectorAll(".work-card-story")].flatMap((card) => {
+  const stage = card.querySelector(".work-story-stage");
+  const details = card.querySelector(".work-details");
+  return card instanceof HTMLElement && stage instanceof HTMLElement && details instanceof HTMLElement
+    ? [{ card, stage, details, lastProgress: -1, lastDetailsHeight: -1 }]
+    : [];
+});
 
-if (scrollStory instanceof HTMLElement && scrollStoryStage instanceof HTMLElement) {
+if (scrollStories.length) {
   let storyFrame = 0;
-  let lastStoryProgress = -1;
   const updateStory = () => {
     storyFrame = 0;
     const enabled = !prefersReducedMotion.matches && storyViewport.matches;
-    scrollStory.classList.toggle("is-scroll-story", enabled);
-    if (!enabled) {
-      lastStoryProgress = -1;
-      return;
-    }
+    for (const story of scrollStories) {
+      story.card.classList.toggle("is-scroll-story", enabled);
+      if (!enabled) {
+        story.lastProgress = -1;
+        story.lastDetailsHeight = -1;
+        continue;
+      }
 
-    const bounds = scrollStory.getBoundingClientRect();
-    const distance = bounds.height - scrollStoryStage.offsetHeight;
-    const progress = distance > 0 ? Math.max(0, Math.min(1, -bounds.top / distance)) : 0;
-    if (progress === lastStoryProgress) {
-      return;
+      const bounds = story.card.getBoundingClientRect();
+      const stageHeight = story.stage.offsetHeight;
+      const holdDistance = stageHeight * 0.8;
+      const animationDistance = bounds.height - stageHeight - holdDistance;
+      const progress = animationDistance > 0 ? Math.max(0, Math.min(1, -bounds.top / animationDistance)) : 0;
+      const detailsHeight = story.details.offsetHeight;
+      if (progress === story.lastProgress && detailsHeight === story.lastDetailsHeight) {
+        continue;
+      }
+      story.lastProgress = progress;
+      story.lastDetailsHeight = detailsHeight;
+      story.stage.style.setProperty("--story-art-width", `${60 + progress * 40}%`);
+      story.stage.style.setProperty("--story-art-gap", `${detailsHeight * (1 - progress)}px`);
+      story.stage.style.setProperty("--story-details-opacity", String(Math.max(0, Math.min(1, (0.85 - progress) / 0.4))));
+      story.stage.style.setProperty("--story-word-x", `${-18 + progress * 36}px`);
+      story.stage.style.setProperty("--story-word-y", `${24 - progress * 24}px`);
+      story.stage.style.setProperty("--story-word-scale", String(0.82 + progress * 0.58));
+      story.stage.style.setProperty("--story-line-angle", `${-30 + progress * 45}deg`);
+      story.stage.style.setProperty("--story-line-scale", String(0.8 + progress * 0.45));
+      story.stage.style.setProperty("--story-number-opacity", String(0.4 + progress * 0.6));
+      story.stage.style.setProperty("--story-number-y", `${36 - progress * 36}px`);
+      story.stage.style.setProperty("--story-details-y", `${20 - progress * 20}px`);
     }
-    lastStoryProgress = progress;
-    scrollStoryStage.style.setProperty("--story-word-x", `${-18 + progress * 36}px`);
-    scrollStoryStage.style.setProperty("--story-word-y", `${24 - progress * 24}px`);
-    scrollStoryStage.style.setProperty("--story-word-scale", String(0.82 + progress * 0.38));
-    scrollStoryStage.style.setProperty("--story-line-angle", `${-30 + progress * 45}deg`);
-    scrollStoryStage.style.setProperty("--story-line-scale", String(0.8 + progress * 0.45));
-    scrollStoryStage.style.setProperty("--story-number-opacity", String(0.4 + progress * 0.6));
-    scrollStoryStage.style.setProperty("--story-number-y", `${36 - progress * 36}px`);
-    scrollStoryStage.style.setProperty("--story-details-y", `${20 - progress * 20}px`);
   };
   const scheduleStoryUpdate = () => {
     if (!storyFrame) {
