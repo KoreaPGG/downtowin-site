@@ -172,6 +172,12 @@ button {
   line-height: 1.1;
 }
 
+.hero .hero-wordmark {
+  font-size: clamp(48px, 11vw, 150px);
+  letter-spacing: -0.09em;
+  line-height: 1;
+}
+
 .hero h1 span {
   color: var(--green);
 }
@@ -473,7 +479,7 @@ button {
   --service-symbol: #304d36;
   color: #20231f;
   background:
-    repeating-linear-gradient(90deg, transparent 0 55px, rgba(23, 28, 24, 0.035) 56px 57px),
+    radial-gradient(circle at 82% 25%, rgba(48, 77, 54, 0.05), transparent 28%),
     #eeece3;
 }
 
@@ -513,10 +519,13 @@ button {
   transform: translateY(-30%);
 }
 
-.service-card:nth-child(3) .symbol-type {
-  width: clamp(120px, 13vw, 160px);
-  height: clamp(120px, 13vw, 160px);
-  font-size: clamp(100px, 13vw, 150px);
+.service-card:nth-child(3) .type-specimen {
+  top: 12%;
+  right: 5%;
+  left: 5%;
+  width: auto;
+  height: 120px;
+  transform: none;
 }
 
 .service-card:nth-child(4) .symbol-camera {
@@ -623,14 +632,113 @@ button {
 .symbol-match i { top: 18%; right: 18%; }
 .symbol-match b { bottom: 18%; left: 18%; }
 
-.symbol-type {
-  width: clamp(180px, 28vw, 340px);
-  height: clamp(180px, 28vw, 340px);
-  font-family: "Noto Sans KR", serif;
-  font-size: clamp(140px, 25vw, 300px);
-  font-weight: 500;
-  letter-spacing: -0.16em;
+.type-specimen {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  container-type: inline-size;
+  cursor: pointer;
+}
+
+.type-specimen:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 8px;
+}
+
+.type-specimen-word,
+.type-specimen-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 6vw, 90px);
+  font-size: clamp(24px, 16cqw, var(--tech-font-size, 150px));
+  font-weight: var(--tech-font-weight, 600);
+  letter-spacing: -0.08em;
   line-height: 1;
+  white-space: nowrap;
+}
+
+.type-specimen-letter {
+  display: inline-block;
+  color: transparent;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--service-symbol) 0 var(--dash-length, 4px),
+    transparent var(--dash-length, 4px) calc(var(--dash-length, 4px) + var(--dash-gap, 2px))
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+}
+
+.type-specimen-letter:not(:last-child) {
+  margin-right: -0.08em;
+}
+
+.type-specimen.is-revealing .type-specimen-letter {
+  animation: type-letter-reveal var(--letter-duration, 220ms) ease-out var(--letter-delay, 0ms) both;
+}
+
+.type-specimen-fallback {
+  transition: opacity 180ms ease;
+}
+
+.type-specimen.is-ready .type-specimen-fallback {
+  opacity: 0;
+}
+
+.type-specimen-speck {
+  position: absolute;
+  z-index: 1;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--service-symbol);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}
+
+.type-specimen.is-ready .type-specimen-speck {
+  opacity: 0.35;
+}
+
+.type-specimen.is-kicking .type-specimen-word {
+  animation: type-text-kick 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.type-specimen.is-kicking .type-specimen-speck {
+  animation: type-speck-kick 620ms ease-out var(--speck-delay, 0ms) both;
+}
+
+@keyframes type-letter-reveal {
+  to {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+}
+
+@keyframes type-text-kick {
+  35% {
+    transform: translateY(-0.08em) scale(1.025);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes type-speck-kick {
+  to {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--kick-x)), calc(-50% + var(--kick-y))) scale(1.8);
+  }
 }
 
 .symbol-camera {
@@ -1475,6 +1583,15 @@ button {
     transform: translateY(-25%);
   }
 
+  .service-card:nth-child(3) .type-specimen {
+    top: 12%;
+    right: 5%;
+    left: 5%;
+    width: auto;
+    height: 120px;
+    transform: none;
+  }
+
   .contact-panel {
     gap: 35px;
     padding: 45px;
@@ -1519,11 +1636,15 @@ button {
     transform: translateY(-25%);
   }
 
-  .service-card:nth-child(3) .symbol-type {
-    width: clamp(120px, 13vw, 145px);
-    height: clamp(120px, 13vw, 145px);
-    font-size: clamp(100px, 13vw, 140px);
+  .service-card:nth-child(3) .type-specimen {
+    top: 12%;
+    right: 5%;
+    left: 5%;
+    width: auto;
+    height: 120px;
+    transform: none;
   }
+
 }
 
 @media (max-width: 680px) {
@@ -1620,6 +1741,10 @@ button {
   .hero h1 {
     margin-top: 19px;
     font-size: clamp(42px, 11vw, 62px);
+  }
+
+  .hero .hero-wordmark {
+    font-size: clamp(48px, 12vw, 70px);
   }
 
   .hero-description {
@@ -1754,10 +1879,13 @@ button {
     transform: translateY(-40%);
   }
 
-  .service-card:nth-child(3) .symbol-type {
-    width: min(70vw, 270px);
-    height: min(70vw, 270px);
-    font-size: min(62vw, 240px);
+  .service-card:nth-child(3) .type-specimen {
+    top: 30%;
+    right: 5%;
+    left: 5%;
+    width: auto;
+    height: 150px;
+    transform: none;
   }
 
   .service-card:nth-child(4) .symbol-camera {
@@ -1977,5 +2105,16 @@ button {
   *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .type-specimen-letter {
+    clip-path: none;
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .type-specimen.is-kicking .type-specimen-word,
+  .type-specimen.is-kicking .type-specimen-speck {
+    animation: none !important;
   }
 }
