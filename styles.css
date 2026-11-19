@@ -185,16 +185,15 @@ main > section[id] {
 
 .hero h1 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(42px, 12vw, 180px);
-  font-weight: 600;
-  letter-spacing: -0.09em;
-  line-height: 1;
+  line-height: 0;
 }
 
-.hero .hero-wordmark {
-  width: 100%;
-  text-align: center;
+.hero-wordmark img {
+  display: block;
+  width: min(75vw, 700px);
+  max-width: 100%;
+  max-height: 50vh;
+  height: auto;
 }
 
 .button {
