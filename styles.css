@@ -21,6 +21,10 @@ html {
   scroll-snap-type: y mandatory;
 }
 
+html.is-story-scrolling {
+  scroll-snap-type: none;
+}
+
 body {
   margin: 0;
   color: var(--ink);

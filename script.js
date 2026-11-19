@@ -14,6 +14,7 @@ if (scrollStories.length) {
   const updateStory = () => {
     storyFrame = 0;
     const enabled = !prefersReducedMotion.matches && storyViewport.matches;
+    let insideStory = false;
     for (const story of scrollStories) {
       story.card.classList.toggle("is-scroll-story", enabled);
       if (!enabled) {
@@ -23,6 +24,7 @@ if (scrollStories.length) {
       }
 
       const bounds = story.card.getBoundingClientRect();
+      insideStory ||= bounds.top <= 1 && bounds.bottom > 1;
       const stageHeight = story.stage.offsetHeight;
       const holdDistance = stageHeight * 0.8;
       const animationDistance = bounds.height - stageHeight - holdDistance;
@@ -45,6 +47,9 @@ if (scrollStories.length) {
       story.stage.style.setProperty("--story-number-y", `${36 - progress * 36}px`);
       story.stage.style.setProperty("--story-details-y", `${20 - progress * 20}px`);
     }
+    if (!insideStory) {
+      document.documentElement.classList.remove("is-story-scrolling");
+    }
   };
   const scheduleStoryUpdate = () => {
     if (!storyFrame) {
@@ -56,6 +61,83 @@ if (scrollStories.length) {
   prefersReducedMotion.addEventListener("change", scheduleStoryUpdate);
   storyViewport.addEventListener("change", scheduleStoryUpdate);
   updateStory();
+
+  let scrollBudget = 0;
+  let budgetTime = 0;
+  let budgetDirection = 0;
+  let touchPosition = null;
+
+  const limitStoryScroll = (delta) => {
+    if (prefersReducedMotion.matches || !storyViewport.matches || !delta) {
+      return false;
+    }
+
+    const current = window.scrollY;
+    const target = current + delta;
+    const crossesStory = scrollStories.some(({ card }) => {
+      const bounds = card.getBoundingClientRect();
+      const start = current + bounds.top;
+      const end = start + bounds.height;
+      return Math.max(current, target) > start && Math.min(current, target) < end;
+    });
+    if (!crossesStory) {
+      budgetTime = 0;
+      return false;
+    }
+
+    const now = performance.now();
+    const direction = Math.sign(delta);
+    // Limit a burst without blocking continued scrolling or a change of direction.
+    const capacity = window.innerHeight * 0.6;
+    if (!budgetTime || direction !== budgetDirection) {
+      scrollBudget = capacity;
+    } else {
+      scrollBudget = Math.min(capacity, scrollBudget + (now - budgetTime) * window.innerHeight * 0.0007);
+    }
+    budgetTime = now;
+    budgetDirection = direction;
+
+    const distance = Math.min(Math.abs(delta), scrollBudget);
+    scrollBudget -= distance;
+    if (distance > 0) {
+      // Mandatory snapping would pull small inputs back to the end of a long story.
+      document.documentElement.classList.add("is-story-scrolling");
+      window.scrollTo({ top: current + direction * distance, behavior: "instant" });
+    }
+    return true;
+  };
+
+  window.addEventListener("wheel", (event) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY) || !event.cancelable) {
+      return;
+    }
+    const multiplier = event.deltaMode === WheelEvent.DOM_DELTA_LINE
+      ? 16
+      : event.deltaMode === WheelEvent.DOM_DELTA_PAGE ? window.innerHeight : 1;
+    if (limitStoryScroll(event.deltaY * multiplier)) {
+      event.preventDefault();
+    }
+  }, { passive: false });
+
+  window.addEventListener("touchstart", (event) => {
+    touchPosition = event.touches.length === 1
+      ? { x: event.touches[0].clientX, y: event.touches[0].clientY }
+      : null;
+  }, { passive: true });
+
+  window.addEventListener("touchmove", (event) => {
+    if (!touchPosition || event.touches.length !== 1) {
+      touchPosition = null;
+      return;
+    }
+    const touch = event.touches[0];
+    const deltaX = touchPosition.x - touch.clientX;
+    const deltaY = touchPosition.y - touch.clientY;
+    touchPosition = { x: touch.clientX, y: touch.clientY };
+    if (event.cancelable && Math.abs(deltaY) > Math.abs(deltaX) && limitStoryScroll(deltaY)) {
+      event.preventDefault();
+    }
+  }, { passive: false });
 }
 
 const techTextStates = new Map();
