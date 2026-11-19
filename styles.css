@@ -95,6 +95,55 @@ main > section {
   .work-card.section-entered .work-details > * {
     animation: section-enter 600ms ease-out;
   }
+
+  .text-entered .scroll-tech-letter {
+    display: inline-block;
+    background-image: repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 6px);
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: scroll-tech-reveal 500ms ease-out var(--letter-delay) both;
+  }
+
+  main p.text-entered,
+  main li.text-entered,
+  .work-details > span.text-entered,
+  .timeline-row > span.text-entered {
+    animation: text-enter 600ms ease-out both;
+  }
+}
+
+@keyframes scroll-tech-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(0.25em);
+    -webkit-text-fill-color: transparent;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  70% {
+    -webkit-text-fill-color: transparent;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
+@keyframes text-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes section-enter {

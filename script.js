@@ -43,6 +43,61 @@ if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
   ).forEach((section) => {
     sectionObserver.observe(section);
   });
+
+  const textObserver = new IntersectionObserver((entries, observer) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) {
+        continue;
+      }
+
+      const element = entry.target;
+      if (element.matches("h2, h3")) {
+        if (!element.hasAttribute("aria-label")) {
+          element.setAttribute("aria-label", element.innerText.replace(/\s+/gu, " ").trim());
+        }
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+        const textNodes = [];
+        while (walker.nextNode()) {
+          textNodes.push(walker.currentNode);
+        }
+
+        const segmenter = typeof Intl.Segmenter === "function"
+          ? new Intl.Segmenter(document.documentElement.lang, { granularity: "grapheme" })
+          : null;
+        const characters = textNodes.map((node) => segmenter
+          ? Array.from(segmenter.segment(node.textContent), (part) => part.segment)
+          : Array.from(node.textContent));
+        const count = characters.flat().filter((character) => !/\s/u.test(character)).length;
+        const delay = Math.min(0.035, 0.8 / Math.max(1, count - 1));
+        let index = 0;
+
+        textNodes.forEach((node, nodeIndex) => {
+          const fragment = document.createDocumentFragment();
+          for (const character of characters[nodeIndex]) {
+            if (/\s/u.test(character)) {
+              fragment.append(document.createTextNode(character));
+            } else {
+              const letter = document.createElement("span");
+              letter.className = "scroll-tech-letter";
+              letter.setAttribute("aria-hidden", "true");
+              letter.style.setProperty("--letter-delay", `${index * delay}s`);
+              letter.textContent = character;
+              fragment.append(letter);
+              index += 1;
+            }
+          }
+          node.replaceWith(fragment);
+        });
+      }
+
+      element.classList.add("text-entered");
+      observer.unobserve(element);
+    }
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.15 });
+
+  document.querySelectorAll("main h2, main h3, main p, main li, .work-details > span, .timeline-row > span").forEach((text) => {
+    textObserver.observe(text);
+  });
 }
 
 for (const specimen of typeSpecimens) {
