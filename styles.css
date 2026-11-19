@@ -43,41 +43,6 @@ button {
   margin: 0 auto;
 }
 
-.site-header {
-  position: fixed;
-  z-index: 5;
-  top: 0;
-  left: 0;
-  display: flex;
-  width: 100%;
-  height: 66px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 max(40px, calc((100% - 1200px) / 2));
-  border-bottom: 1px solid rgba(226, 231, 226, 0.82);
-  background: rgba(248, 249, 246, 0.9);
-  backdrop-filter: blur(18px);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(-110%);
-  transition:
-    transform 260ms ease,
-    opacity 180ms ease,
-    visibility 0s linear 260ms;
-}
-
-body.has-scrolled .site-header {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateY(0);
-  transition:
-    transform 260ms ease,
-    opacity 180ms ease,
-    visibility 0s linear;
-}
-
 main > section {
   scroll-snap-align: start;
   scroll-snap-stop: always;
@@ -110,6 +75,75 @@ main > section {
   .timeline-row > span.text-entered {
     animation: text-enter 600ms ease-out both;
   }
+
+  .scroll-tech-letter,
+  .type-specimen-letter {
+    transition: translate 600ms cubic-bezier(0.2, 1.5, 0.5, 1);
+  }
+
+  .tech-letter-active {
+    position: relative;
+    z-index: 2;
+    cursor: grab;
+    background-image: none !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+
+  .type-specimen-letter.tech-letter-active {
+    color: inherit;
+  }
+
+  .tech-letter-active::before {
+    position: absolute;
+    z-index: 1;
+    inset: -5px;
+    border: 1px solid currentColor;
+    content: "";
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .tech-letter-active::after {
+    position: absolute;
+    z-index: 1;
+    bottom: calc(100% + 7px);
+    left: -5px;
+    color: currentColor;
+    content: attr(data-tech-label);
+    font: 9px ui-monospace, monospace;
+    letter-spacing: 0;
+    white-space: nowrap;
+    -webkit-text-fill-color: currentColor;
+    pointer-events: none;
+  }
+
+  .tech-letter-dragging {
+    cursor: grabbing;
+    transition: none;
+  }
+
+  .tech-outline {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: calc(100% + 12px);
+    height: calc(100% + 12px);
+    pointer-events: none;
+  }
+
+  .tech-speck {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: currentColor;
+    animation: tech-speck-blink 1.3s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+}
+
+@keyframes tech-speck-blink {
+  from { opacity: 0.15; }
+  to { opacity: 0.8; }
 }
 
 @keyframes scroll-tech-reveal {
@@ -169,12 +203,6 @@ main > section {
   letter-spacing: -0.07em;
 }
 
-.header-logo {
-  display: block;
-  width: 52px;
-  height: auto;
-}
-
 .brand-mark {
   display: grid;
   width: 29px;
@@ -189,48 +217,9 @@ main > section {
   letter-spacing: -0.05em;
 }
 
-.navigation {
-  display: flex;
-  align-items: center;
-  gap: 31px;
-  color: #485149;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.navigation > a {
-  transition: color 180ms ease;
-}
-
-.navigation > a:hover,
 .text-link:hover,
 .work-card:hover .work-details h3 {
   color: var(--green);
-}
-
-.navigation .nav-contact {
-  display: inline-flex;
-  min-height: 34px;
-  align-items: center;
-  gap: 10px;
-  padding: 0 15px;
-  border-radius: 999px;
-  color: #fff;
-  background: #1b201d;
-  transition: background 180ms ease;
-}
-
-.navigation .nav-contact:hover {
-  color: #fff;
-  background: var(--green);
-}
-
-.nav-contact span {
-  font-size: 14px;
-}
-
-.menu-toggle {
-  display: none;
 }
 
 .hero {
@@ -1507,17 +1496,8 @@ main > section {
 }
 
 @media (max-width: 900px) {
-  .site-header {
-    padding-right: 28px;
-    padding-left: 28px;
-  }
-
   .section-shell {
     width: calc(100% - 56px);
-  }
-
-  .navigation {
-    gap: 21px;
   }
 
   .intro-inner,
@@ -1626,12 +1606,6 @@ main > section {
 }
 
 @media (max-width: 680px) {
-  .site-header {
-    height: 58px;
-    padding-right: 20px;
-    padding-left: 20px;
-  }
-
   .brand {
     font-size: 15px;
   }
@@ -1639,68 +1613,6 @@ main > section {
   .brand-mark {
     width: 26px;
     height: 26px;
-  }
-
-  .menu-toggle {
-    position: relative;
-    z-index: 2;
-    display: grid;
-    width: 37px;
-    height: 37px;
-    place-content: center;
-    gap: 5px;
-    border: 1px solid #e1e7e0;
-    border-radius: 50%;
-    background: #fff;
-  }
-
-  .menu-toggle span {
-    width: 14px;
-    height: 1px;
-    background: #304337;
-    transition: transform 180ms ease;
-  }
-
-  .menu-toggle[aria-expanded="true"] span:first-child {
-    transform: translateY(3px) rotate(45deg);
-  }
-
-  .menu-toggle[aria-expanded="true"] span:last-child {
-    transform: translateY(-3px) rotate(-45deg);
-  }
-
-  .navigation {
-    position: absolute;
-    top: 51px;
-    right: 13px;
-    left: 13px;
-    display: none;
-    align-items: stretch;
-    gap: 0;
-    padding: 7px 16px 14px;
-    border: 1px solid #e4e9e2;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 14px 30px rgba(29, 55, 37, 0.08);
-  }
-
-  .navigation.is-open {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .navigation > a {
-    padding: 12px 0;
-    border-bottom: 1px solid #edf0eb;
-    font-size: 11px;
-  }
-
-  .navigation .nav-contact {
-    min-height: auto;
-    justify-content: space-between;
-    margin-top: 4px;
-    padding: 11px 13px;
-    border-bottom: 0;
   }
 
   .section-shell {
@@ -2025,8 +1937,8 @@ main > section:not(.hero) {
 .contact-section {
   display: flex;
   align-items: center;
-  padding-top: 78px;
-  padding-bottom: 20px;
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
 .intro-inner,
@@ -2037,8 +1949,8 @@ main > section:not(.hero) {
 
 .recognition {
   align-content: center;
-  padding-top: 78px;
-  padding-bottom: 20px;
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
 .contact-section {
@@ -2070,7 +1982,7 @@ main > section:not(.hero) {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 90px clamp(28px, 6.2vw, 96px) 30px;
+  padding: 30px clamp(28px, 6.2vw, 96px);
 }
 
 .service-grid,
@@ -2082,7 +1994,7 @@ main > section:not(.hero) {
 .services .service-card:nth-child(n) {
   min-height: 100vh;
   min-height: 100svh;
-  padding: 94px clamp(28px, 6.2vw, 96px) clamp(30px, 5vh, 60px);
+  padding: clamp(30px, 5vh, 60px) clamp(28px, 6.2vw, 96px);
   border-right: 0;
 }
 
@@ -2105,13 +2017,13 @@ main > section:not(.hero) {
 
 .work-heading {
   align-items: center;
-  padding: 90px max(40px, calc((100% - 1200px) / 2)) 30px;
+  padding: 30px max(40px, calc((100% - 1200px) / 2));
 }
 
 .work-card {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  padding-top: 66px;
+  padding: 0;
 }
 
 .work-section .work-art,
@@ -2165,7 +2077,7 @@ main > section:not(.hero) {
   .history-section,
   .contact-section,
   .recognition {
-    padding-top: 68px;
+    padding-top: 20px;
     padding-bottom: 20px;
   }
 
@@ -2203,11 +2115,11 @@ main > section:not(.hero) {
   }
 
   .services > .section-heading {
-    padding: 78px 22px 30px;
+    padding: 30px 22px;
   }
 
   .services .service-card:nth-child(n) {
-    padding: 80px 22px 30px;
+    padding: 30px 22px;
   }
 
   .work-heading {
@@ -2216,13 +2128,13 @@ main > section:not(.hero) {
     align-items: flex-start;
     justify-content: center;
     gap: 0;
-    padding: 78px 22px 30px;
+    padding: 30px 22px;
   }
 
   .work-card {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(220px, 1fr) auto;
-    padding-top: 58px;
+    padding: 0;
   }
 
   .work-details {
