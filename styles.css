@@ -53,6 +53,67 @@ main > section {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .section-color-transition {
+    transition: background-color 900ms ease;
+  }
+
+  .services > .section-heading.section-color-transition,
+  .recognition.section-color-transition,
+  .contact-section.section-color-transition {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .services > .section-heading.section-color-transition::before,
+  .recognition.section-color-transition::before,
+  .contact-section.section-color-transition::before {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 100vw;
+    background-color: #f5f6f2;
+    content: "";
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition: background-color 900ms ease;
+  }
+
+  .intro-band.section-color-active {
+    background-color: #eff4ed;
+  }
+
+  .services > .section-heading.section-color-active::before,
+  .recognition.section-color-active::before {
+    background-color: #e9f0e7;
+  }
+
+  .contact-section.section-color-active::before {
+    background-color: #e5eee4;
+  }
+
+  .service-card.section-color-active:nth-child(1) { background-color: #244b36; }
+  .service-card.section-color-active:nth-child(2) { background-color: #e4f65f; }
+  .service-card.section-color-active:nth-child(3) { background-color: #e0e8dd; }
+  .service-card.section-color-active:nth-child(4) { background-color: #f38462; }
+  .service-card.section-color-active:nth-child(5) { background-color: #e6deee; }
+
+  .work-heading.section-color-transition,
+  .work-card.section-color-transition {
+    background-color: #fbfcfa;
+  }
+
+  .work-heading.section-color-active { background-color: #ebf1e9; }
+  .work-card.section-color-active:nth-child(1) { background-color: #e6efe6; }
+  .work-card.section-color-active:nth-child(2) { background-color: #f4e9e3; }
+  .work-card.section-color-active:nth-child(3) { background-color: #ebf1e7; }
+  .work-card.section-color-active:nth-child(4) { background-color: #f4e9e1; }
+  .work-card.section-color-active:nth-child(5) { background-color: #e9eee7; }
+  .work-card.section-color-active:nth-child(6) { background-color: #e8f0f0; }
+  .work-card.section-color-active:nth-child(7) { background-color: #eeeee7; }
+  .history-section.section-color-active { background-color: #24382b; }
+
   main > section.section-entered:not(.hero):not(.services):not(.work-section),
   .services > .section-heading.section-entered,
   .service-card.section-entered,

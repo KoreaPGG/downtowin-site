@@ -217,6 +217,19 @@ if (techTextVisibility && !prefersReducedMotion.matches) {
 }
 
 if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
+  const colorObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      entry.target.classList.toggle("section-color-active", entry.isIntersecting);
+    }
+  }, { rootMargin: "-30% 0px -30% 0px" });
+
+  document.querySelectorAll(
+    ".intro-band, .services > .section-heading, .service-card, .work-heading, .work-card, .recognition, .history-section, .contact-section",
+  ).forEach((section) => {
+    section.classList.add("section-color-transition");
+    colorObserver.observe(section);
+  });
+
   const sectionObserver = new IntersectionObserver((entries, observer) => {
     for (const entry of entries) {
       if (entry.isIntersecting) {
