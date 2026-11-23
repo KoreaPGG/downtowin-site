@@ -97,7 +97,7 @@ if (siteHeader && menuToggle instanceof HTMLButtonElement && siteMenu instanceof
   });
 }
 
-const scrollStories = [...document.querySelectorAll(".work-card-story")].flatMap((card) => {
+const scrollStories = [...document.querySelectorAll(".work-card-story:not(.work-card-video)")].flatMap((card) => {
   const stage = card.querySelector(".work-story-stage");
   const details = card.querySelector(".work-details");
   return card instanceof HTMLElement && stage instanceof HTMLElement && details instanceof HTMLElement
