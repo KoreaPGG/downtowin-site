@@ -2145,8 +2145,8 @@ main > section:not(.hero) {
 
 @media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
   .work-card-story.is-scroll-story {
-    min-height: 280vh;
-    min-height: 280svh;
+    min-height: 200vh;
+    min-height: 200svh;
   }
 
   .is-scroll-story .work-story-stage {
@@ -2154,6 +2154,7 @@ main > section:not(.hero) {
     top: 0;
     height: 100vh;
     height: 100svh;
+    overflow: clip;
     background-color: inherit;
   }
 

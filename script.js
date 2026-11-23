@@ -27,7 +27,7 @@ if (scrollStories.length) {
       const bounds = story.card.getBoundingClientRect();
       insideStory ||= bounds.top <= 1 && bounds.bottom > 1;
       const stageHeight = story.stage.offsetHeight;
-      const holdDistance = stageHeight * 0.5;
+      const holdDistance = stageHeight * 0.25;
       const animationDistance = bounds.height - stageHeight - holdDistance;
       const progress = animationDistance > 0 ? Math.max(0, Math.min(1, -bounds.top / animationDistance)) : 0;
       const detailsHeight = story.details.offsetHeight;
