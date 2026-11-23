@@ -122,8 +122,7 @@ if (scrollStories.length) {
       const bounds = story.card.getBoundingClientRect();
       insideStory ||= bounds.top <= 1 && bounds.bottom > 1;
       const stageHeight = story.stage.offsetHeight;
-      const holdDistance = stageHeight * 0.25;
-      const animationDistance = bounds.height - stageHeight - holdDistance;
+      const animationDistance = bounds.height - stageHeight;
       const progress = animationDistance > 0 ? Math.max(0, Math.min(1, -bounds.top / animationDistance)) : 0;
       const detailsHeight = story.details.offsetHeight;
       if (progress === story.lastProgress && detailsHeight === story.lastDetailsHeight) {
@@ -172,11 +171,29 @@ if (scrollStories.length) {
 
     const current = window.scrollY;
     const target = current + delta;
+    const direction = Math.sign(delta);
+    let storyBoundary = null;
     const crossesStory = scrollStories.some(({ card }) => {
       const bounds = card.getBoundingClientRect();
       const start = current + bounds.top;
       const end = start + bounds.height;
-      return Math.max(current, target) > start && Math.min(current, target) < end;
+      const overlapsStory = Math.max(current, target) > start && Math.min(current, target) < end;
+      if (!overlapsStory) {
+        return false;
+      }
+
+      if (direction > 0) {
+        if (current < start && target > start) {
+          storyBoundary ??= start;
+        } else if (current < end && target > end) {
+          storyBoundary ??= end;
+        }
+      } else if (current > end && target < end) {
+        storyBoundary ??= end;
+      } else if (current > start && target < start) {
+        storyBoundary ??= start;
+      }
+      return true;
     });
     if (!crossesStory) {
       budgetTime = 0;
@@ -184,7 +201,6 @@ if (scrollStories.length) {
     }
 
     const now = performance.now();
-    const direction = Math.sign(delta);
     // Limit a burst without blocking continued scrolling or a change of direction.
     const capacity = window.innerHeight * 0.6;
     if (!budgetTime || direction !== budgetDirection) {
@@ -195,7 +211,11 @@ if (scrollStories.length) {
     budgetTime = now;
     budgetDirection = direction;
 
-    const distance = Math.min(Math.abs(delta), scrollBudget);
+    const distance = Math.min(
+      Math.abs(delta),
+      scrollBudget,
+      storyBoundary === null ? Infinity : Math.abs(storyBoundary - current),
+    );
     scrollBudget -= distance;
     if (distance > 0) {
       // Mandatory snapping would pull small inputs back to the end of a long story.
@@ -477,9 +497,19 @@ if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
   }, { rootMargin: "0px 0px -12% 0px" });
 
   document.querySelectorAll(
-    "main > section:not(.hero):not(.services):not(.work-section), .services > .section-heading, .service-card, .work-heading, .work-card",
+    "main > section:not(.hero):not(.services):not(.work-section), .services > .section-heading, .service-card, .work-heading",
   ).forEach((section) => {
     sectionObserver.observe(section);
+  });
+
+  const workCardObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      entry.target.classList.toggle("section-entered", entry.isIntersecting);
+    }
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll(".work-card").forEach((section) => {
+    workCardObserver.observe(section);
   });
 
   const textObserver = new IntersectionObserver((entries, observer) => {
