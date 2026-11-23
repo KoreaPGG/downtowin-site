@@ -19,13 +19,9 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: none;
   overflow-x: clip;
   scrollbar-gutter: stable;
-}
-
-html.is-story-scrolling {
-  scroll-snap-type: none;
 }
 
 body {
@@ -315,15 +311,6 @@ button {
 .section-shell {
   width: min(100% - 80px, 1200px);
   margin: 0 auto;
-}
-
-main > section {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-}
-
-.site-footer {
-  scroll-snap-align: end;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1539,14 +1526,16 @@ main > section {
 }
 
 .art-ovle {
-  flex-direction: column;
-  gap: 12px;
   background: #d8d6ca;
   color: #34372d;
 }
 
-.art-ovle .art-caption {
-  color: #77796d;
+.art-ovle iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
 }
 
 .ovle-wordmark {
@@ -2334,7 +2323,6 @@ main > section:not(.hero) {
 .work-section {
   overflow: visible;
   padding: 0;
-  scroll-snap-align: none;
 }
 
 .services > .section-heading,
@@ -2343,8 +2331,6 @@ main > section:not(.hero) {
 .work-card {
   min-height: 100vh;
   min-height: 100svh;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 .services > .section-heading {
@@ -2415,8 +2401,8 @@ main > section:not(.hero) {
 
 @media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
   .work-card-story.is-scroll-story {
-    min-height: 120vh;
-    min-height: 120svh;
+    height: 120vh;
+    height: 120svh;
   }
 
   .is-scroll-story .work-story-stage {

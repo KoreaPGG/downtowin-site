@@ -110,7 +110,6 @@ if (scrollStories.length) {
   const updateStory = () => {
     storyFrame = 0;
     const enabled = !prefersReducedMotion.matches && storyViewport.matches;
-    let insideStory = false;
     for (const story of scrollStories) {
       story.card.classList.toggle("is-scroll-story", enabled);
       if (!enabled) {
@@ -120,7 +119,6 @@ if (scrollStories.length) {
       }
 
       const bounds = story.card.getBoundingClientRect();
-      insideStory ||= bounds.top <= 1 && bounds.bottom > 1;
       const stageHeight = story.stage.offsetHeight;
       const animationDistance = bounds.height - stageHeight;
       const progress = animationDistance > 0 ? Math.max(0, Math.min(1, -bounds.top / animationDistance)) : 0;
@@ -143,9 +141,6 @@ if (scrollStories.length) {
       story.stage.style.setProperty("--story-number-opacity", String(0.4 + progress * 0.6));
       story.stage.style.setProperty("--story-number-y", `${36 - progress * 36}px`);
       story.stage.style.setProperty("--story-details-y", `${20 - progress * 20}px`);
-    }
-    if (!insideStory) {
-      document.documentElement.classList.remove("is-story-scrolling");
     }
   };
   const scheduleStoryUpdate = () => {
@@ -172,6 +167,7 @@ if (scrollStories.length) {
     const current = window.scrollY;
     const target = current + delta;
     const direction = Math.sign(delta);
+    const boundaryTolerance = 1 / window.devicePixelRatio;
     let storyBoundary = null;
     const crossesStory = scrollStories.some(({ card }) => {
       const bounds = card.getBoundingClientRect();
@@ -183,14 +179,14 @@ if (scrollStories.length) {
       }
 
       if (direction > 0) {
-        if (current < start && target > start) {
+        if (current < start && target > start && start - current > boundaryTolerance) {
           storyBoundary ??= start;
-        } else if (current < end && target > end) {
+        } else if (current < end && target > end && end - current > boundaryTolerance) {
           storyBoundary ??= end;
         }
-      } else if (current > end && target < end) {
+      } else if (current > end && target < end && current - end > boundaryTolerance) {
         storyBoundary ??= end;
-      } else if (current > start && target < start) {
+      } else if (current > start && target < start && current - start > boundaryTolerance) {
         storyBoundary ??= start;
       }
       return true;
@@ -218,8 +214,6 @@ if (scrollStories.length) {
     );
     scrollBudget -= distance;
     if (distance > 0) {
-      // Mandatory snapping would pull small inputs back to the end of a long story.
-      document.documentElement.classList.add("is-story-scrolling");
       window.scrollTo({ top: current + direction * distance, behavior: "instant" });
     }
     return true;
