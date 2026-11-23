@@ -1,6 +1,7 @@
 const typeSpecimens = document.querySelectorAll(".type-specimen");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const storyViewport = window.matchMedia("(min-height: 600px)");
+const wideStoryViewport = window.matchMedia("(min-width: 1440px) and (min-aspect-ratio: 16/9)");
 const scrollStories = [...document.querySelectorAll(".work-card-story")].flatMap((card) => {
   const stage = card.querySelector(".work-story-stage");
   const details = card.querySelector(".work-details");
@@ -26,7 +27,7 @@ if (scrollStories.length) {
       const bounds = story.card.getBoundingClientRect();
       insideStory ||= bounds.top <= 1 && bounds.bottom > 1;
       const stageHeight = story.stage.offsetHeight;
-      const holdDistance = stageHeight * 0.8;
+      const holdDistance = stageHeight * 0.5;
       const animationDistance = bounds.height - stageHeight - holdDistance;
       const progress = animationDistance > 0 ? Math.max(0, Math.min(1, -bounds.top / animationDistance)) : 0;
       const detailsHeight = story.details.offsetHeight;
@@ -35,12 +36,14 @@ if (scrollStories.length) {
       }
       story.lastProgress = progress;
       story.lastDetailsHeight = detailsHeight;
-      story.stage.style.setProperty("--story-art-width", `${60 + progress * 40}%`);
+      const artStartWidth = wideStoryViewport.matches ? 72 : 68;
+      const graphicScale = (0.82 + progress * 0.58) * (wideStoryViewport.matches ? 1.12 : 1);
+      story.stage.style.setProperty("--story-art-width", `${artStartWidth + progress * (100 - artStartWidth)}%`);
       story.stage.style.setProperty("--story-art-gap", `${detailsHeight * (1 - progress)}px`);
       story.stage.style.setProperty("--story-details-opacity", String(Math.max(0, Math.min(1, (0.85 - progress) / 0.4))));
       story.stage.style.setProperty("--story-word-x", `${-18 + progress * 36}px`);
       story.stage.style.setProperty("--story-word-y", `${24 - progress * 24}px`);
-      story.stage.style.setProperty("--story-word-scale", String(0.82 + progress * 0.58));
+      story.stage.style.setProperty("--story-word-scale", String(graphicScale));
       story.stage.style.setProperty("--story-line-angle", `${-30 + progress * 45}deg`);
       story.stage.style.setProperty("--story-line-scale", String(0.8 + progress * 0.45));
       story.stage.style.setProperty("--story-number-opacity", String(0.4 + progress * 0.6));

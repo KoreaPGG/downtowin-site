@@ -2145,8 +2145,8 @@ main > section:not(.hero) {
 
 @media (prefers-reduced-motion: no-preference) and (min-height: 600px) {
   .work-card-story.is-scroll-story {
-    min-height: 400vh;
-    min-height: 400svh;
+    min-height: 280vh;
+    min-height: 280svh;
   }
 
   .is-scroll-story .work-story-stage {
@@ -2161,7 +2161,7 @@ main > section:not(.hero) {
     position: absolute;
     top: 0;
     left: 0;
-    width: var(--story-art-width, 60%);
+    width: var(--story-art-width, 68%);
     height: 100%;
   }
 
@@ -2194,6 +2194,114 @@ main > section:not(.hero) {
 
   .is-scroll-story .work-details > * {
     translate: 0 var(--story-details-y, 20px);
+  }
+}
+
+@media (min-width: 1440px) and (min-aspect-ratio: 16/9) {
+  .section-shell {
+    width: min(100% - 128px, 1600px);
+  }
+
+  .work-heading {
+    padding-right: max(64px, calc((100% - 1600px) / 2));
+    padding-left: max(64px, calc((100% - 1600px) / 2));
+  }
+
+  .art-caption {
+    top: 28px;
+    left: 32px;
+    font-size: 11px;
+  }
+
+  .art-changwon::before {
+    top: -20%;
+    width: min(42vw, 720px);
+    height: min(42vw, 720px);
+  }
+
+  .art-changwon::after {
+    top: -8%;
+    width: min(30vw, 520px);
+    height: min(52vw, 850px);
+  }
+
+  .art-wordmark {
+    font-size: clamp(58px, 6vw, 104px);
+  }
+
+  .art-number {
+    font-size: 30px;
+  }
+
+  .art-emblem {
+    width: clamp(100px, 9vw, 160px);
+    height: clamp(116px, 10.5vw, 185px);
+    font-size: clamp(38px, 3.6vw, 64px);
+  }
+
+  .art-emblem i {
+    font-size: 0.38em;
+  }
+
+  .art-gijang .art-wordmark {
+    font-size: clamp(22px, 2.1vw, 36px);
+  }
+
+  .type-glyph {
+    font-size: clamp(200px, 19vw, 340px);
+  }
+
+  .type-label {
+    right: 32px;
+    bottom: 30px;
+    font-size: 11px;
+  }
+
+  .dasi-wordmark {
+    font-size: clamp(120px, 12vw, 210px);
+  }
+
+  .dasi-subtitle,
+  .photo-index {
+    right: 32px;
+    bottom: 30px;
+    font-size: 11px;
+  }
+
+  .dasi-shape {
+    width: min(20vw, 340px);
+  }
+
+  .photo-frame {
+    width: clamp(220px, 18vw, 320px);
+    height: clamp(260px, 24vw, 420px);
+  }
+
+  .photo-frame span {
+    font-size: clamp(22px, 1.8vw, 32px);
+  }
+
+  .glasses i {
+    width: clamp(100px, 9vw, 156px);
+    height: clamp(68px, 6vw, 104px);
+    border-width: 4px;
+  }
+
+  .vento-wordmark {
+    font-size: clamp(48px, 4vw, 70px);
+  }
+
+  .ovle-wordmark {
+    font-size: clamp(90px, 8vw, 138px);
+  }
+
+  .ovle-subtitle {
+    font-size: 11px;
+  }
+
+  .ovle-orbit {
+    width: min(24vw, 410px);
+    height: min(12vw, 205px);
   }
 }
 
