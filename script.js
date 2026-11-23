@@ -2,6 +2,101 @@ const typeSpecimens = document.querySelectorAll(".type-specimen");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const storyViewport = window.matchMedia("(min-height: 600px)");
 const wideStoryViewport = window.matchMedia("(min-width: 1440px) and (min-aspect-ratio: 16/9)");
+const siteHeader = document.querySelector(".site-header");
+const menuToggle = siteHeader?.querySelector(".menu-toggle");
+const siteMenu = document.querySelector("#site-menu");
+const siteBrand = siteHeader?.querySelector(".site-header-brand");
+const mainContent = document.querySelector("main");
+const siteFooter = document.querySelector(".site-footer");
+
+if (siteHeader && menuToggle instanceof HTMLButtonElement && siteMenu instanceof HTMLElement) {
+  let menuScrollY = 0;
+  const setMenuOpen = (open, restoreFocus = true) => {
+    if (open) {
+      menuScrollY = window.scrollY;
+      document.body.style.setProperty("--menu-scroll-offset", `${-menuScrollY}px`);
+    }
+    menuToggle.setAttribute("aria-expanded", String(open));
+    menuToggle.setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기");
+    siteHeader.classList.toggle("is-menu-open", open);
+    siteMenu.hidden = !open;
+    document.body.classList.toggle("menu-open", open);
+    if (siteBrand instanceof HTMLElement) {
+      siteBrand.inert = open;
+    }
+    if (mainContent instanceof HTMLElement) {
+      mainContent.inert = open;
+    }
+    if (siteFooter instanceof HTMLElement) {
+      siteFooter.inert = open;
+    }
+
+    if (open) {
+      window.requestAnimationFrame(() => siteMenu.querySelector("a[href]")?.focus({ preventScroll: true }));
+    } else {
+      document.body.style.removeProperty("--menu-scroll-offset");
+      window.scrollTo({ top: menuScrollY, behavior: "instant" });
+      if (restoreFocus) {
+        menuToggle.focus({ preventScroll: true });
+      }
+    }
+  };
+
+  menuToggle.addEventListener("click", () => {
+    setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true");
+  });
+
+  siteMenu.addEventListener("click", (event) => {
+    if (event.target === siteMenu) {
+      setMenuOpen(false);
+      return;
+    }
+
+    const link = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null;
+    if (!(link instanceof HTMLAnchorElement)) {
+      return;
+    }
+
+    const target = document.querySelector(link.hash);
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    event.preventDefault();
+    setMenuOpen(false, false);
+    window.history.pushState(null, "", link.hash);
+    target.scrollIntoView({ behavior: prefersReducedMotion.matches ? "instant" : "smooth", block: "start" });
+    if (!target.hasAttribute("tabindex")) {
+      target.setAttribute("tabindex", "-1");
+      target.addEventListener("blur", () => target.removeAttribute("tabindex"), { once: true });
+    }
+    target.focus({ preventScroll: true });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (menuToggle.getAttribute("aria-expanded") !== "true") {
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setMenuOpen(false);
+      return;
+    }
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const focusable = [menuToggle, ...siteMenu.querySelectorAll('a[href], button:not([disabled])')];
+    if (event.shiftKey && document.activeElement === focusable[0]) {
+      event.preventDefault();
+      focusable.at(-1)?.focus();
+    } else if (!event.shiftKey && document.activeElement === focusable.at(-1)) {
+      event.preventDefault();
+      focusable[0].focus();
+    }
+  });
+}
+
 const scrollStories = [...document.querySelectorAll(".work-card-story")].flatMap((card) => {
   const stage = card.querySelector(".work-story-stage");
   const details = card.querySelector(".work-details");
