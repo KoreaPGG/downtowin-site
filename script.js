@@ -28,9 +28,9 @@ if (siteHeader && menuToggle instanceof HTMLButtonElement && siteMenu instanceof
   let suppressClickUntil = 0;
 
   const menuWheelRowHeight = () => {
-    const navigation = menuWheel?.parentElement;
-    const rowHeight = navigation instanceof HTMLElement
-      ? Number.parseFloat(getComputedStyle(navigation).getPropertyValue("--option-wheel-row-height"))
+    const row = menuWheelRows[0];
+    const rowHeight = row instanceof HTMLElement
+      ? Number.parseFloat(getComputedStyle(row).height)
       : Number.NaN;
     return Number.isFinite(rowHeight) ? rowHeight : 68;
   };
@@ -98,6 +98,7 @@ if (siteHeader && menuToggle instanceof HTMLButtonElement && siteMenu instanceof
   if (menuWheel instanceof HTMLOListElement && menuWheelAnchors.length) {
     menuWheel.classList.add("is-option-wheel");
     selectMenuWheelItem(menuWheelIndex, { playSound: false });
+    window.addEventListener("resize", () => selectMenuWheelItem(menuWheelIndex, { playSound: false }), { passive: true });
 
     menuWheel.addEventListener("keydown", (event) => {
       let nextIndex = menuWheelIndex;
@@ -297,6 +298,237 @@ if (siteHeader && menuToggle instanceof HTMLButtonElement && siteMenu instanceof
       focusable[0].focus();
     }
   });
+}
+
+const flowingMenu = document.querySelector("[data-flowing-menu]");
+if (flowingMenu instanceof HTMLOListElement) {
+  const flowingItems = [...flowingMenu.querySelectorAll(".flowing-menu-item")];
+  const flowingSpeed = 60;
+  const flowingStretch = 0.6;
+  const flowingMagnet = 0.25;
+  const flowingFollowCursor = 0.4;
+  let hoveredFlowingItem = null;
+  let focusedFlowingItem = null;
+  let previousPointerX = null;
+
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const updateFlowingMenu = () => {
+    const activeItem = focusedFlowingItem ?? hoveredFlowingItem;
+    for (const item of flowingItems) {
+      item.classList.toggle("is-flowing-active", item === activeItem);
+    }
+  };
+
+  const projectDialog = document.querySelector(".project-dialog");
+  const projectDialogArt = projectDialog?.querySelector(".project-dialog-art");
+  const projectDialogCategory = projectDialog?.querySelector(".project-dialog-category");
+  const projectDialogTitle = projectDialog?.querySelector("#project-dialog-title");
+  const projectDialogDescription = projectDialog?.querySelector("#project-dialog-description");
+  const flowingMenuSection = flowingMenu.closest(".flowing-menu-section");
+  let pausedPreview = null;
+  let detailVideo = null;
+  let selectedProjectButton = null;
+
+  if (
+    projectDialog instanceof HTMLElement
+    && projectDialogArt instanceof HTMLElement
+    && flowingMenuSection instanceof HTMLElement
+  ) {
+    const returnToProjects = () => {
+      window.scrollTo({
+        top: window.scrollY + flowingMenuSection.getBoundingClientRect().top,
+        behavior: prefersReducedMotion.matches ? "instant" : "smooth",
+      });
+      selectedProjectButton?.focus({ preventScroll: true });
+    };
+
+    projectDialog.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        returnToProjects();
+      }
+    });
+    const updateProjectScroll = () => {
+      if (projectDialog.hidden) {
+        return;
+      }
+      const bounds = projectDialog.getBoundingClientRect();
+      const menuBounds = flowingMenuSection.getBoundingClientRect();
+      const detailVisible = bounds.bottom > 0 && bounds.top < window.innerHeight;
+      document.documentElement.classList.toggle(
+        "project-detail-scrolling",
+        bounds.top < window.innerHeight && menuBounds.bottom > 0,
+      );
+      if (detailVideo && pausedPreview) {
+        if (detailVisible && !detailVideo.frame.hasAttribute("src")) {
+          pausedPreview.frame.removeAttribute("src");
+          detailVideo.frame.setAttribute("src", detailVideo.src);
+        } else if (!detailVisible && detailVideo.frame.hasAttribute("src")) {
+          detailVideo.frame.removeAttribute("src");
+          pausedPreview.frame.setAttribute("src", pausedPreview.src);
+        }
+      }
+    };
+    window.addEventListener("scroll", updateProjectScroll, { passive: true });
+    window.addEventListener("resize", updateProjectScroll, { passive: true });
+  }
+
+  const updateMarqueeDuration = () => {
+    for (const item of flowingItems) {
+      const track = item.querySelector(".flowing-menu-track");
+      const group = track?.firstElementChild;
+      if (track instanceof HTMLElement && group instanceof HTMLElement) {
+        track.style.setProperty("--flowing-duration", `${group.getBoundingClientRect().width / flowingSpeed}s`);
+      }
+    }
+  };
+
+  for (const item of flowingItems) {
+    const button = item.querySelector(".flowing-menu-trigger");
+    const track = item.querySelector(".flowing-menu-track");
+    const group = track?.firstElementChild;
+    if (!(button instanceof HTMLButtonElement) || !(track instanceof HTMLElement) || !(group instanceof HTMLElement)) {
+      continue;
+    }
+
+    const repeatedGroup = group.cloneNode(true);
+    repeatedGroup.setAttribute("aria-hidden", "true");
+    const repeatedVideo = repeatedGroup.querySelector("iframe");
+    if (repeatedVideo) {
+      const ovleArt = repeatedVideo.closest(".art-ovle");
+      repeatedVideo.remove();
+      if (ovleArt) {
+        const orbit = document.createElement("span");
+        orbit.className = "ovle-orbit";
+        const wordmark = document.createElement("span");
+        wordmark.className = "ovle-wordmark";
+        wordmark.textContent = "Ovle";
+        const subtitle = document.createElement("span");
+        subtitle.className = "ovle-subtitle";
+        subtitle.textContent = "FASHION BRANDING";
+        ovleArt.append(orbit, wordmark, subtitle);
+      }
+    }
+    track.append(repeatedGroup);
+
+    button.addEventListener("pointerenter", (event) => {
+      if (focusedFlowingItem !== item) {
+        focusedFlowingItem = null;
+      }
+      hoveredFlowingItem = item;
+      previousPointerX = event.clientX;
+      updateFlowingMenu();
+    });
+
+    button.addEventListener("pointermove", (event) => {
+      if (hoveredFlowingItem !== item) {
+        return;
+      }
+      const bounds = button.getBoundingClientRect();
+      const offsetX = event.clientX - bounds.left - bounds.width / 2;
+      const offsetY = event.clientY - bounds.top - bounds.height / 2;
+      const pointerDelta = previousPointerX === null ? 0 : event.clientX - previousPointerX;
+      previousPointerX = event.clientX;
+      item.style.setProperty("--flowing-follow-x", `${clamp(offsetX * flowingFollowCursor, -130, 130)}px`);
+      item.style.setProperty("--flowing-stretch", String(1 + clamp(Math.abs(pointerDelta) / 100 * flowingStretch, 0, flowingStretch)));
+      button.style.setProperty("--flowing-magnet-x", `${clamp(offsetX * flowingMagnet, -20, 20)}px`);
+      button.style.setProperty("--flowing-magnet-y", `${clamp(offsetY * flowingMagnet, -12, 12)}px`);
+    });
+
+    button.addEventListener("pointerleave", () => {
+      if (hoveredFlowingItem === item) {
+        hoveredFlowingItem = null;
+      }
+      previousPointerX = null;
+      item.style.removeProperty("--flowing-follow-x");
+      item.style.removeProperty("--flowing-stretch");
+      button.style.removeProperty("--flowing-magnet-x");
+      button.style.removeProperty("--flowing-magnet-y");
+      updateFlowingMenu();
+    });
+
+    button.addEventListener("focus", () => {
+      focusedFlowingItem = item;
+      updateFlowingMenu();
+    });
+
+    button.addEventListener("blur", (event) => {
+      if (!(event.relatedTarget instanceof Node && item.contains(event.relatedTarget)) && focusedFlowingItem === item) {
+        focusedFlowingItem = null;
+        updateFlowingMenu();
+      }
+    });
+
+    button.addEventListener("click", () => {
+      const art = group.querySelector(".work-art");
+      const category = button.querySelector(".flowing-menu-category");
+      const title = button.querySelector(".flowing-menu-title strong");
+      const description = button.querySelector(".flowing-menu-description");
+      if (
+        !(projectDialog instanceof HTMLElement)
+        || !(projectDialogArt instanceof HTMLElement)
+        || !projectDialogCategory || !(projectDialogTitle instanceof HTMLElement) || !projectDialogDescription
+        || !art || !category || !title || !description
+      ) {
+        console.error("프로젝트 상세 화면을 열 수 없습니다.");
+        return;
+      }
+
+      if (pausedPreview) {
+        pausedPreview.frame.setAttribute("src", pausedPreview.src);
+        pausedPreview = null;
+      }
+      detailVideo = null;
+      const artwork = art.cloneNode(true);
+      const detailFrame = artwork.querySelector("iframe");
+      const previewFrame = art.querySelector("iframe");
+      const previewSrc = previewFrame?.getAttribute("src");
+      if (detailFrame instanceof HTMLIFrameElement && previewFrame instanceof HTMLIFrameElement && previewSrc) {
+        detailFrame.setAttribute("inert", "");
+        pausedPreview = { frame: previewFrame, src: previewSrc };
+        detailVideo = { frame: detailFrame, src: previewSrc };
+        previewFrame.removeAttribute("src");
+      }
+      projectDialogArt.replaceChildren(artwork);
+      projectDialogCategory.textContent = category.textContent;
+      projectDialogTitle.textContent = title.textContent;
+      projectDialogDescription.textContent = description.textContent;
+      selectedProjectButton = button;
+      projectDialog.hidden = false;
+      document.documentElement.classList.add("project-detail-scrolling");
+      projectDialog.scrollIntoView({ behavior: "instant", block: "start" });
+      projectDialogTitle.focus({ preventScroll: true });
+    });
+  }
+
+  updateMarqueeDuration();
+  window.addEventListener("resize", updateMarqueeDuration, { passive: true });
+  if (document.fonts) {
+    void document.fonts.ready.then(updateMarqueeDuration);
+  }
+
+  const flowingMenuHeader = document.querySelector(".site-header");
+  if (
+    flowingMenuSection instanceof HTMLElement
+    && flowingMenuHeader instanceof HTMLElement
+    && "IntersectionObserver" in window
+  ) {
+    const visibleDarkSections = new Set();
+    const headerObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          visibleDarkSections.add(entry.target);
+        } else {
+          visibleDarkSections.delete(entry.target);
+        }
+      }
+      flowingMenuHeader.classList.toggle("is-over-dark-work", visibleDarkSections.size > 0);
+    }, { rootMargin: "-80px 0px -80px 0px" });
+    headerObserver.observe(flowingMenuSection);
+    if (projectDialog instanceof HTMLElement) {
+      headerObserver.observe(projectDialog);
+    }
+  }
 }
 
 const scrollStories = [...document.querySelectorAll(".work-card-story:not(.work-card-video)")].flatMap((card) => {
@@ -763,7 +995,9 @@ if ("IntersectionObserver" in window && !prefersReducedMotion.matches) {
   }, { rootMargin: "0px 0px -8% 0px", threshold: 0.15 });
 
   document.querySelectorAll("main h2, main h3, main p, main li, .work-details > span, .timeline-row > span").forEach((text) => {
-    textObserver.observe(text);
+    if (!text.closest(".project-dialog")) {
+      textObserver.observe(text);
+    }
   });
 }
 

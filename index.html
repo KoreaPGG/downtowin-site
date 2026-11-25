@@ -174,82 +174,145 @@
         </div>
       </section>
 
-      <section class="work-section" id="work">
+      <div class="project-dialog" id="project-detail" role="region" aria-labelledby="project-dialog-title" aria-describedby="project-dialog-description" hidden>
+        <div class="project-dialog-art" aria-hidden="true"></div>
+        <div class="project-dialog-details">
+          <p class="project-dialog-category"></p>
+          <h2 id="project-dialog-title" tabindex="-1"></h2>
+          <p id="project-dialog-description"></p>
+        </div>
+      </div>
+
+      <section class="work-section flowing-menu-section" id="work" aria-labelledby="selected-work-title">
         <div class="section-shell">
-          <div class="work-grid">
-            <article class="work-card work-wide work-card-story">
-              <div class="work-story-stage">
-                <div class="work-art art-changwon" aria-hidden="true">
-                  <span class="art-caption">CWFC · SEASON SYSTEM</span>
-                  <span class="art-wordmark story-graphic">CHANGWON<br />FOOTBALL CLUB</span>
-                  <div class="art-lines"></div>
-                  <span class="art-number">20<br />26</span>
-                </div>
-                <div class="work-details">
-                  <div><p>SPORTS BRANDING · SOCIAL DESIGN</p><h3>창원FC</h3></div>
-                  <span>시즌 비주얼 시스템 / 소셜 미디어 운영</span>
-                </div>
-              </div>
-            </article>
-            <article class="work-card work-card-story">
-              <div class="work-story-stage">
-                <div class="work-art art-gijang" aria-hidden="true">
-                  <span class="art-caption">GIJANG · CLUB IDENTITY</span>
-                  <span class="art-emblem story-graphic">G<br /><i>FC</i></span>
-                  <span class="art-wordmark">GUNMIN<br />FOOTBALL</span>
-                </div>
-                <div class="work-details">
-                  <div><p>SPORTS BRANDING</p><h3>기장군민축구단</h3></div>
-                  <span>구단 디자인 개선</span>
-                </div>
-              </div>
-            </article>
-            <article class="work-card work-wide work-card-story">
-              <div class="work-story-stage">
-                <div class="work-art art-dasi" aria-hidden="true">
-                  <span class="art-caption">DASI, · FASHION BRAND</span>
-                  <span class="dasi-wordmark story-graphic">dasi,</span>
-                  <span class="dasi-subtitle">A STUDY IN FORM &amp; EVERYDAY</span>
-                  <div class="dasi-shape"></div>
-                </div>
-                <div class="work-details">
-                  <div><p>FASHION BRANDING</p><h3>dasi,</h3></div>
-                  <span>패션 브랜드 아이덴티티</span>
-                </div>
-              </div>
-            </article>
-            <article class="work-card work-card-story">
-              <div class="work-story-stage">
-                <div class="work-art art-photo" aria-hidden="true">
-                  <div class="photo-frame story-graphic"><span>THE<br />GAME<br />IN MOTION</span></div>
-                  <span class="photo-index">JINACHIN / 2026</span>
-                </div>
-                <div class="work-details">
-                  <div><p>PHOTOGRAPHY</p><h3>Jinachin</h3></div>
-                  <span>사진 및 현장 기록</span>
-                </div>
-              </div>
-            </article>
-            <article class="work-card work-card-story work-card-video">
-              <div class="work-story-stage">
-                <div class="work-art art-ovle">
-                  <iframe
-                    src="https://player.vimeo.com/video/1201914005?title=0&amp;byline=0&amp;portrait=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;background=1"
-                    title="Ovle 브랜드 영상"
-                    loading="lazy"
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    tabindex="-1"
-                  ></iframe>
-                </div>
-                <div class="work-details">
-                  <div><p>FASHION BRANDING</p><h3>Ovle</h3></div>
-                  <span>패션 브랜드 · 론칭 준비 중</span>
-                  <p class="work-footnote">* 일부 프로젝트는 론칭 준비 중입니다.</p>
-                </div>
-              </div>
-            </article>
+          <div class="flowing-menu-section-heading">
+            <h2 id="selected-work-title">SELECTED WORK</h2>
           </div>
+          <ol class="flowing-menu" data-flowing-menu aria-label="주요 프로젝트">
+            <li class="flowing-menu-item">
+              <button class="flowing-menu-trigger" type="button" aria-controls="project-detail">
+                <span class="flowing-menu-index" aria-hidden="true">01</span>
+                <span class="flowing-menu-title">
+                  <span class="flowing-menu-category">SPORTS BRANDING · SOCIAL DESIGN</span>
+                  <strong>창원FC</strong>
+                </span>
+                <span class="flowing-menu-description">시즌 비주얼 시스템 / 소셜 미디어 운영</span>
+              </button>
+              <div class="flowing-menu-marquee" aria-hidden="true">
+                <div class="flowing-menu-track">
+                  <div class="flowing-menu-group">
+                    <span class="flowing-menu-copy">창원FC</span>
+                    <div class="flowing-menu-preview">
+                      <div class="work-art art-changwon">
+                        <span class="art-wordmark">CHANGWON<br />FOOTBALL CLUB</span>
+                        <div class="art-lines"></div>
+                        <span class="art-number">20<br />26</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="flowing-menu-item">
+              <button class="flowing-menu-trigger" type="button" aria-controls="project-detail">
+                <span class="flowing-menu-index" aria-hidden="true">02</span>
+                <span class="flowing-menu-title">
+                  <span class="flowing-menu-category">SPORTS BRANDING</span>
+                  <strong>기장군민축구단</strong>
+                </span>
+                <span class="flowing-menu-description">구단 디자인 개선</span>
+              </button>
+              <div class="flowing-menu-marquee" aria-hidden="true">
+                <div class="flowing-menu-track">
+                  <div class="flowing-menu-group">
+                    <span class="flowing-menu-copy">기장군민축구단</span>
+                    <div class="flowing-menu-preview">
+                      <div class="work-art art-gijang">
+                        <span class="art-emblem">G<br /><i>FC</i></span>
+                        <span class="art-wordmark">GUNMIN<br />FOOTBALL</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="flowing-menu-item">
+              <button class="flowing-menu-trigger" type="button" aria-controls="project-detail">
+                <span class="flowing-menu-index" aria-hidden="true">03</span>
+                <span class="flowing-menu-title">
+                  <span class="flowing-menu-category">FASHION BRANDING</span>
+                  <strong>dasi,</strong>
+                </span>
+                <span class="flowing-menu-description">패션 브랜드 아이덴티티</span>
+              </button>
+              <div class="flowing-menu-marquee" aria-hidden="true">
+                <div class="flowing-menu-track">
+                  <div class="flowing-menu-group">
+                    <span class="flowing-menu-copy">dasi,</span>
+                    <div class="flowing-menu-preview">
+                      <div class="work-art art-dasi">
+                        <span class="dasi-wordmark">dasi,</span>
+                        <span class="dasi-subtitle">A STUDY IN FORM &amp; EVERYDAY</span>
+                        <div class="dasi-shape"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="flowing-menu-item">
+              <button class="flowing-menu-trigger" type="button" aria-controls="project-detail">
+                <span class="flowing-menu-index" aria-hidden="true">04</span>
+                <span class="flowing-menu-title">
+                  <span class="flowing-menu-category">PHOTOGRAPHY</span>
+                  <strong>Jinachin</strong>
+                </span>
+                <span class="flowing-menu-description">사진 및 현장 기록</span>
+              </button>
+              <div class="flowing-menu-marquee" aria-hidden="true">
+                <div class="flowing-menu-track">
+                  <div class="flowing-menu-group">
+                    <span class="flowing-menu-copy">Jinachin</span>
+                    <div class="flowing-menu-preview">
+                      <div class="work-art art-photo">
+                        <div class="photo-frame"><span>THE<br />GAME<br />IN MOTION</span></div>
+                        <span class="photo-index">JINACHIN / 2026</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="flowing-menu-item">
+              <button class="flowing-menu-trigger" type="button" aria-controls="project-detail">
+                <span class="flowing-menu-index" aria-hidden="true">05</span>
+                <span class="flowing-menu-title">
+                  <span class="flowing-menu-category">FASHION BRANDING</span>
+                  <strong>Ovle</strong>
+                </span>
+                <span class="flowing-menu-description">패션 브랜드 · 론칭 준비 중</span>
+              </button>
+              <div class="flowing-menu-marquee" aria-hidden="true">
+                <div class="flowing-menu-track">
+                  <div class="flowing-menu-group">
+                    <span class="flowing-menu-copy">Ovle</span>
+                    <div class="flowing-menu-preview">
+                      <div class="work-art art-ovle">
+                        <iframe
+                          src="https://player.vimeo.com/video/1201914005?title=0&amp;byline=0&amp;portrait=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;background=1"
+                          title="Ovle 브랜드 영상"
+                          loading="lazy"
+                          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                          referrerpolicy="strict-origin-when-cross-origin"
+                          tabindex="-1"
+                        ></iframe>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ol>
         </div>
       </section>
 
