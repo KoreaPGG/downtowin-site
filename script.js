@@ -528,6 +528,10 @@ if (flowingMenu instanceof HTMLOListElement) {
     if (projectDialog instanceof HTMLElement) {
       headerObserver.observe(projectDialog);
     }
+    const contactSection = document.querySelector(".contact-section");
+    if (contactSection instanceof HTMLElement) {
+      headerObserver.observe(contactSection);
+    }
   }
 }
 
