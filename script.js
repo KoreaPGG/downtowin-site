@@ -10,6 +10,206 @@ const mainContent = document.querySelector("main");
 const siteFooter = document.querySelector(".site-footer");
 
 if (siteHeader && menuToggle instanceof HTMLButtonElement && siteMenu instanceof HTMLElement) {
+  const menuWheel = siteMenu.querySelector("[data-option-wheel]");
+  const menuWheelAnchors = menuWheel instanceof HTMLOListElement
+    ? [...menuWheel.querySelectorAll("a[href^='#']")]
+    : [];
+  const menuWheelRows = menuWheel instanceof HTMLOListElement
+    ? [...menuWheel.querySelectorAll(":scope > li")]
+    : [];
+  const menuWheelConfig = { curve: 1, tilt: 6, blur: 2, fade: 0.25, soundVolume: 0.5 };
+  let menuWheelIndex = Math.min(2, menuWheelAnchors.length - 1);
+  let wheelAudioContext = null;
+  let wheelDelta = 0;
+  let pointerStartY = null;
+  let activePointerId = null;
+  let pointerStartIndex = menuWheelIndex;
+  let pointerDragged = false;
+  let suppressClickUntil = 0;
+
+  const menuWheelRowHeight = () => {
+    const navigation = menuWheel?.parentElement;
+    const rowHeight = navigation instanceof HTMLElement
+      ? Number.parseFloat(getComputedStyle(navigation).getPropertyValue("--option-wheel-row-height"))
+      : Number.NaN;
+    return Number.isFinite(rowHeight) ? rowHeight : 68;
+  };
+
+  const playMenuWheelSound = () => {
+    if (typeof window.AudioContext !== "function") {
+      return;
+    }
+
+    wheelAudioContext ??= new window.AudioContext();
+    const context = wheelAudioContext;
+    const play = () => {
+      const now = context.currentTime;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(1150, now);
+      oscillator.frequency.exponentialRampToValueAtTime(680, now + 0.05);
+      gain.gain.setValueAtTime(0.018 * menuWheelConfig.soundVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(now);
+      oscillator.stop(now + 0.06);
+    };
+
+    if (context.state === "suspended") {
+      void context.resume().then(play).catch((error) => {
+        console.warn("메뉴 휠 효과음을 재생할 수 없습니다.", error);
+      });
+    } else {
+      play();
+    }
+  };
+
+  const selectMenuWheelItem = (index, { focus = false, playSound = true } = {}) => {
+    if (!menuWheelAnchors.length || !(menuWheel instanceof HTMLOListElement)) {
+      return;
+    }
+
+    const nextIndex = Math.max(0, Math.min(menuWheelAnchors.length - 1, index));
+    const changed = nextIndex !== menuWheelIndex;
+    menuWheelIndex = nextIndex;
+    menuWheel.style.setProperty("--option-wheel-offset", `${-nextIndex * menuWheelRowHeight()}px`);
+
+    menuWheelRows.forEach((row, rowIndex) => {
+      const offset = rowIndex - nextIndex;
+      const distance = Math.abs(offset);
+      row.classList.toggle("is-wheel-active", rowIndex === nextIndex);
+      row.style.setProperty("--option-wheel-opacity", String(Math.max(menuWheelConfig.fade, 1 - distance * menuWheelConfig.fade)));
+      row.style.setProperty("--option-wheel-blur", `${Math.min(distance * menuWheelConfig.blur, 4)}px`);
+      row.style.setProperty("--option-wheel-scale", String(Math.max(0.82, 1 - distance * 0.04)));
+      row.style.setProperty("--option-wheel-x", `${-(distance ** 2) * menuWheelConfig.curve * 6}px`);
+      row.style.setProperty("--option-wheel-tilt", `${Math.sign(offset) * Math.min(distance * menuWheelConfig.tilt, 18)}deg`);
+    });
+
+    if (changed && playSound) {
+      playMenuWheelSound();
+    }
+    if (focus) {
+      menuWheelAnchors[nextIndex].focus({ preventScroll: true });
+    }
+  };
+
+  if (menuWheel instanceof HTMLOListElement && menuWheelAnchors.length) {
+    menuWheel.classList.add("is-option-wheel");
+    selectMenuWheelItem(menuWheelIndex, { playSound: false });
+
+    menuWheel.addEventListener("keydown", (event) => {
+      let nextIndex = menuWheelIndex;
+      if (event.key === "ArrowDown") {
+        nextIndex += 1;
+      } else if (event.key === "ArrowUp") {
+        nextIndex -= 1;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = menuWheelAnchors.length - 1;
+      } else {
+        return;
+      }
+
+      event.preventDefault();
+      selectMenuWheelItem(nextIndex, { focus: true });
+    });
+
+    menuWheel.addEventListener("focusin", (event) => {
+      if (pointerStartY !== null) {
+        return;
+      }
+      const anchor = event.target instanceof Element ? event.target.closest("a[href^='#']") : null;
+      const index = menuWheelAnchors.indexOf(anchor);
+      if (index >= 0) {
+        selectMenuWheelItem(index, { playSound: false });
+      }
+    });
+
+    menuWheel.addEventListener("wheel", (event) => {
+      if (!event.deltaY || event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      const multiplier = event.deltaMode === WheelEvent.DOM_DELTA_LINE
+        ? menuWheelRowHeight() / 3
+        : event.deltaMode === WheelEvent.DOM_DELTA_PAGE ? menuWheelRowHeight() * 5 : 1;
+      wheelDelta += event.deltaY * multiplier;
+      const threshold = menuWheelRowHeight() * 0.45;
+      while (Math.abs(wheelDelta) >= threshold) {
+        const direction = Math.sign(wheelDelta);
+        selectMenuWheelItem(menuWheelIndex + direction);
+        wheelDelta -= direction * threshold;
+      }
+    }, { passive: false });
+
+    menuWheel.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || !event.isPrimary) {
+        return;
+      }
+      activePointerId = event.pointerId;
+      pointerStartY = event.clientY;
+      pointerStartIndex = menuWheelIndex;
+      pointerDragged = false;
+    });
+
+    window.addEventListener("pointermove", (event) => {
+      if (pointerStartY === null || activePointerId !== event.pointerId) {
+        return;
+      }
+
+      const movement = pointerStartY - event.clientY;
+      if (Math.abs(movement) > 6) {
+        pointerDragged = true;
+        menuWheel.classList.add("is-dragging");
+      }
+      if (!pointerDragged) {
+        return;
+      }
+
+      event.preventDefault();
+      const threshold = menuWheelRowHeight() * 0.42;
+      const steps = Math.trunc(movement / threshold);
+      selectMenuWheelItem(pointerStartIndex + steps);
+    });
+
+    const finishMenuWheelDrag = (event) => {
+      if (pointerStartY === null || activePointerId !== event.pointerId) {
+        return;
+      }
+      if (pointerDragged) {
+        suppressClickUntil = performance.now() + 400;
+      }
+      activePointerId = null;
+      pointerStartY = null;
+      pointerStartIndex = menuWheelIndex;
+      pointerDragged = false;
+      menuWheel.classList.remove("is-dragging");
+    };
+    window.addEventListener("pointerup", finishMenuWheelDrag);
+    window.addEventListener("pointercancel", finishMenuWheelDrag);
+
+    menuWheel.addEventListener("click", (event) => {
+      if (performance.now() < suppressClickUntil) {
+        event.preventDefault();
+        event.stopPropagation();
+        suppressClickUntil = 0;
+        return;
+      }
+      suppressClickUntil = 0;
+
+      const anchor = event.target instanceof Element ? event.target.closest("a[href^='#']") : null;
+      const index = menuWheelAnchors.indexOf(anchor);
+      if (index >= 0) {
+        selectMenuWheelItem(index);
+      }
+    });
+  }
+
   let menuScrollY = 0;
   const setMenuOpen = (open, restoreFocus = true) => {
     if (open) {
@@ -32,7 +232,9 @@ if (siteHeader && menuToggle instanceof HTMLButtonElement && siteMenu instanceof
     }
 
     if (open) {
-      window.requestAnimationFrame(() => siteMenu.querySelector("a[href]")?.focus({ preventScroll: true }));
+      window.requestAnimationFrame(() => {
+        (menuWheelAnchors[menuWheelIndex] ?? siteMenu.querySelector("a[href]"))?.focus({ preventScroll: true });
+      });
     } else {
       document.body.style.removeProperty("--menu-scroll-offset");
       window.scrollTo({ top: menuScrollY, behavior: "instant" });
